@@ -22,12 +22,14 @@ def get_ai_rsa_response(prompt):
                 {"role": "user", "content": prompt}
             ]
         )
-        # print(response)
+        print(response)
         # print(response.model_dump_json(indent=2))
         st.toast("Success! AI response received.")
         return response.choices[0].message.content
     
     except Exception as e:
+        error_message = str(e)
+        st.toast(error_message)
         st.toast("Something went wrong! Try again!")
         return None
 

@@ -61,46 +61,48 @@ def main():
                     st.dataframe(result, hide_index=1)
 
     if method == "RSA":
-
         
         uploaded_file = st.file_uploader("Please upload the search term report")
         user_preference = st.text_input("What are you expecting?", "Ads on Mens products")
 
-        if uploaded_file and user_preference is not None:
-            
-            file_contents = uploaded_file.read()
+        if st.button("Generate assets"):
+            if uploaded_file and user_preference is not None:             
+                file_contents = uploaded_file.read()
 
-            # Break file_contents into chunks
-            chunks = []
-            chunk_size = 1000  # Define the size of each chunk
-            for i in range(0, len(file_contents), chunk_size):
-                chunk = file_contents[i:i+chunk_size]
-                chunks.append(chunk)
+                # Break file_contents into chunks
+                chunks = []
+                chunk_size = 1000  # Define the size of each chunk
+                for i in range(0, len(file_contents), chunk_size):
+                    chunk = file_contents[i:i+chunk_size]
+                    chunks.append(chunk)
 
-            # Generate embeddings for each chunk
-            embeddings = []
-            for chunk in chunks:
-                embedding = generate_embeddings(chunk)
-                embeddings.append(embedding)
-            
+                # Generate embeddings for each chunk
+                embeddings = []
+                for chunk in chunks:
+                    embedding = generate_embeddings(chunk)
+                    embeddings.append(embedding)
+                
 
-            top_texts = search_docs("Generate Ad copies for the brand", chunks, embeddings, top_n=5)
-            
-            prompt = f"Create one Ad Copy strictly with the 15 headlines and 4 descriptions within the maximum allowed character limit according to the user preference: {user_preference} by using the following data: {top_texts}. Do not exceed the mentioned limit."
+                top_texts = search_docs("Generate Ad copies for the brand", chunks, embeddings, top_n=5)
+                
+                prompt = f"Create one Ad Copy strictly with the 15 headlines and 4 descriptions within the maximum allowed character limit according to the user preference: {user_preference} by using the following data: {top_texts}. Do not exceed the mentioned limit. and include adCopy as key"
 
-            with st.spinner('Waiting for AI response...'):
-                ad_copy_json = get_ai_rsa_response(prompt)
-            
-           # st.write(ad_copy_json)
+                with st.spinner('Waiting for AI response...'):
+                    ad_copy_json = get_ai_rsa_response(prompt)
+                
+            # st.write(ad_copy_json)
 
-            # Convert JSON data to DataFrame
-            ad_copy_data = json.loads(ad_copy_json)
-            df = pd.DataFrame(ad_copy_data)
+                # Convert JSON data to DataFrame
+                ad_copy_data = json.loads(ad_copy_json)
+                df = pd.DataFrame(ad_copy_data)
 
-            # Create dataframe
-            df = pd.DataFrame(df['adCopy'])
-            
-            st.dataframe(df)
+                # Create dataframe
+                df = pd.DataFrame(df['adCopy'])
+                
+                st.dataframe(df)
+            else:
+                st.info("Please upload the file!")
+
 
 if __name__ == "__main__":
     main()
